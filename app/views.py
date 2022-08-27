@@ -13,11 +13,10 @@ from django.contrib.auth import authenticate, logout, login as auth_login
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 
-
 # IMPORTATION APP
 import app.forms as af
 import app.models as am
-
+import app.m00_common as m00
 
 def accueil(request):
     template = "index.html"
@@ -133,6 +132,8 @@ def reset_password(request):
                 })
                 
     return render(request, 'auth/reset-password.html', {'form': form})
+
+
 def reset_password_sent(request):
     """
     la fonction resset_password_done notifier l'utilisateur que l'email de
@@ -141,9 +142,51 @@ def reset_password_sent(request):
     context={}
     return render(request, 'auth/reset-password-sent.html', context)
 
+
 def logout_view(request):
     """
     la fonction logout_view permet à un utilisateur de se déconnecter
     """
     logout(request)
     return redirect('/login')
+
+
+def creer_evenement(request):
+    """
+    la fonction creer evenement pour creer un evenement
+    """
+
+
+    types_evenements = m00.EVENEMENT_TYPES
+    types_services = m00.SERVICES_TYPES
+
+    context = {
+        "types_evenements": types_evenements,
+        "types_services": types_services
+    }
+    return render(request, 'evenement/create-evenement.html', context)
+
+
+def ajax_calls(request):
+    if request.method == 'POST':
+        received_json_data = json.loads(request.body)
+        action = received_json_data['action']
+
+        if action == "creer_evenement":
+
+            nv_evenement = am.EvenementClient()
+            nv_evenement.client_profile = request.user.client_profile()
+            nv_evenement.type_evenement = received_json_data['type_evenement']
+            nv_evenement.nombre_invites = received_json_data['invitations']
+            nv_evenement.date = received_json_data['date_evenement']
+            nv_evenement.ville = received_json_data['ville']
+
+            nv_evenement.save()
+            data_dict = {"nv_evenement_id": nv_evenement.id}
+
+        if action == "creer_services_evenement":
+
+            nv_evenement_id = received_json_data['nv_evenement_id']
+            data_dict = {}
+
+    return JsonResponse(data=data_dict, safe=False)

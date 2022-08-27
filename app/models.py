@@ -1,37 +1,12 @@
+
+# Importations Django
 from django.db import models
 from django.contrib.auth.models import User
 
+# Importations Application
+import app.m00_common as m00
+
 # Create your models here.
-
-# DECLARING GLOBAL VARIABLES
-
-CLIENT_TYPES = [
-    ('Client', 'Client'),
-    ('Partenaire', 'Partenaire')
-]
-
-EVENEMENT_TYPES = [
-    ('Marriage', 'Marriage'),
-    ('Anniversaire', 'Anniversaire'),
-    ('Fiançailles', 'Fiançailles'),
-    ('Réunion de famille ou amis', 'Réunion de famille ou amis'),
-    ('Soirée à thème', 'Soirée à thème'),
-    ('Soutenance', 'Soutenance'),
-    ('Conférence', 'Conférence'),
-    ('Autre', 'Autre')
-]
-
-SERVICES_TYPES = [
-    ('Animation musicale', 'Animation musicale'),
-    ('Photos et vidéos', 'Photos et vidéos'),
-    ('Beauté et coiffure', 'Beauté et coiffure'),
-    ('Location de matériel', 'Location de matériel'),
-    ('Soirée à thème', 'Soirée à thème'),
-    ('Traiteur', 'Traiteur'),
-    ('Location de salles', 'Location de salles')
-]
-
-
 
 class ClientProfile(models.Model):
     user = models.OneToOneField(
@@ -48,7 +23,7 @@ class ClientProfile(models.Model):
         max_length=50,
         blank=False,
         null=False,
-        choices=CLIENT_TYPES)
+        choices=m00.CLIENT_TYPES)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -58,10 +33,10 @@ class ClientProfile(models.Model):
 
 class Service(models.Model):
     nom_service = models.CharField(
-        max_length=50,
+        max_length=200,
         blank=False,
         null=False,
-        choices=SERVICES_TYPES)
+        choices=m00.SERVICES_TYPES)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -87,6 +62,7 @@ class ServicePartenaire(models.Model):
     def __str__(self):
         return self.service
 
+
 class ImageServicePartenaire(models.Model):
     service_partenaire = models.ForeignKey(
         ServicePartenaire,
@@ -101,32 +77,23 @@ class ImageServicePartenaire(models.Model):
         return self.service_partenaire
 
 
-class Evenement(models.Model):
-    nom_evenement = models.CharField(
-        max_length=50,
-        blank=False,
-        null=False,
-        choices=EVENEMENT_TYPES)
-
-    def __str__(self):
-        return self.nom_evenement
-
-
 class EvenementClient(models.Model):
     client_profile = models.ForeignKey(
         ClientProfile,
         on_delete=models.CASCADE,
         null=False,
         blank=False)
-    evenement = models.ForeignKey(
-        Evenement,
-        on_delete=models.CASCADE,
+    type_evenement = models.CharField(
+        max_length=200,
+        blank=False,
         null=False,
-        blank=False)
+        choices=m00.EVENEMENT_TYPES)
     nombre_invites = models.PositiveIntegerField(null=False, blank=False, default=1)
     date = models.DateTimeField(blank=False, null=False)
-    ville = models.DateField(blank=False, null=False)
-    description = models.TextField()
+    ville = models.CharField(
+        max_length=200,
+        blank=False,
+        null=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
