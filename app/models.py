@@ -123,9 +123,9 @@ class EvenementClient(models.Model):
         on_delete=models.CASCADE,
         null=False,
         blank=False)
-    nombre_invites = models.PositiveIntegerField(null=False, null=False, default=1)
-    date = models.DateTimeField(null=False, null=False)
-    ville = models.DateField(null=False, null=False)
+    nombre_invites = models.PositiveIntegerField(null=False, blank=False, default=1)
+    date = models.DateTimeField(blank=False, null=False)
+    ville = models.DateField(blank=False, null=False)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

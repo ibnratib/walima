@@ -1,0 +1,173 @@
+{% extends "general/base.html" %}
+{% load i18n %}
+{% load static %}
+{% block body %}
+<main class="content m-3">
+	<div class="container-sm">
+		<!-- <div class="col-12 col-lg-8 col-md-12">		 -->
+			<h1 id="page_title" class="h3 mb-3">Créez votre compte</h1>
+
+			<form method="post">
+				<div id="pharmacy-form" class="card">
+					<div class="card-body">
+						{% if error_message %}
+							<div class="alert alert-danger" role="alert">
+								{{error_message}}
+							</div>
+							{% endif %}
+
+						{% csrf_token %}
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Nom pharmacien</label><span class="required_field">*</span>
+									{{signup_form.nom}}
+								</div>
+							</div>
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Prenom Pharmacien</label><span class="required_field">*</span>
+									{{signup_form.prenom}}	
+								</div>	
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Nom pharmacie</label><span class="required_field">*</span>
+									{{signup_form.nom_pharmacie}}
+								</div>
+							</div>
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Email</label><span class="required_field">*</span>
+									{{signup_form.email}}	
+								</div>	
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Telephone</label><span class="required_field">*</span>
+									{{signup_form.telephone}}
+								</div>
+							</div>
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Ville</label><span class="required_field">*</span>
+									{{signup_form.ville}}
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label">Mot de passe</label><span class="required_field">*</span>
+									<input class="form-control form-control-lg" type="password" id="id_password" name="password" placeholder="Enter password" />
+								</div>
+						
+							</div>
+							<div class="col-md-6 col-sm-12">
+								<div class="mb-3">
+									<label class="form-label" for="{{ signup_form.password_repeat.id_for_label }}">Confirmer le mot de passe <span class="required_field">*</span></label>
+									{{signup_form.password_repeat}}
+								</div>	
+							</div>
+						</div>
+
+                  				
+						<span class="required_field">* champ obligatoire</span>
+
+						<div class="text-center mt-3">
+							<button type="submit" id="ajax_button" class="btn btn-primary">Sign Up</button>
+						</div>
+						<p  style="text-align:right !important; margin-bottom:0px; margin-top:5px" class="text-right"><a href="/login/">Vous avez déja un compte ? Identifiez vous</a></p>
+
+					</div>
+				</div>
+				{% block js %}
+                {{ signup_form.media }}
+              {% endblock %}
+			</form>
+		</div>
+
+</main>
+<style>
+	.required_field{
+		color: red;
+	}
+</style>
+
+
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+<script>
+$(".password_strength_info").html("")
+
+var identical_password=0;
+var valid_password=0;
+
+function enable_disable_button()
+{
+    if (identical_password + valid_password == 2)
+    {
+                 $('#ajax_button').attr("disabled", false);
+                 $("#ajax_button").css("background","#28c194")
+                 $("#ajax_button").css("border","green")
+    }else
+    {
+                $('#ajax_button').attr("disabled", true);
+                 $("#ajax_button").css("background","grey")
+                 $("#ajax_button").css("border","black")
+    }
+}
+
+
+
+
+
+$('#id_password, #id_password_repeat').on('keyup', function () {
+
+  if ($('#id_password').val() == $('#id_password_repeat').val() && $('#id_password').val() != "") {
+    $('#message-matching').html('<div class="success_message">Les mots de passe sont identiques</div>');
+    identical_password = 1;
+  } else
+  {
+  	if ($('#id_password_repeat').val() != "")
+  	{
+  		$('#message-matching').html('<div class="error_message">Les mots de passe ne sont pas identiques</div>');
+  		identical_password = 0;
+  	}else
+  	{
+  		$('#message-matching').html('');
+  		identical_password = 0;
+  	}
+  }
+    enable_disable_button();
+});
+
+
+function getCookie(c_name)
+{
+    if (document.cookie.length > 0)
+    {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1)
+        {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) c_end = document.cookie.length;
+            return unescape(document.cookie.substring(c_start,c_end));
+        }
+    }
+    return "";
+ }
+
+</script>
+
+
+{% endblock %}
