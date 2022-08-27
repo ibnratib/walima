@@ -49,7 +49,12 @@ def login(request):
                     user = authenticate(request , username=email, password=password)
                     if user is not None and user.is_active:
                         auth_login(request, user)
-                        return redirect('/')
+                        client=am.ClientProfile.objects.get(user=user)
+                        if client.type_client == 'Partenaire':
+                            return redirect('list_evenements')
+                        else:
+                            return redirect('/')
+                        
                     else:
                        return render(request, template, {'login_form': login_form,'error_message': "Vous avez entré un email ou un mot de passe invalide"})
             else:
@@ -72,11 +77,13 @@ def register(request):
                 })
             #verifier si les mots de passe nes sont pas identiques
             else:
+
                 #creation d'utilisteur
                 user = User.objects.create_user(
-                    signup_form.cleaned_data['email'],
-                    signup_form.cleaned_data['password'],
-                    signup_form.cleaned_data['user_name'],
+                    email=signup_form.cleaned_data['email'],
+                    password=signup_form.cleaned_data['password_repeat'],
+                    first_name=signup_form.cleaned_data['user_name'],
+                    username=signup_form.cleaned_data['email']
                 )
                 user.save()
                 #creation de pharmacie
@@ -85,14 +92,14 @@ def register(request):
                 pharmacie = am.ClientProfile()
                 pharmacie.telephone_mobile=telephone
                 pharmacie.ville = ville
-                pharmacie.save()
                 pharmacie.user = user
-                pharmacie.save()
-                
+                pharmacie.save()                
                 user = authenticate(
                     request , username=signup_form.cleaned_data['email'],
-                     password=signup_form.cleaned_data['password'])
-                
+                     password=signup_form.cleaned_data['password_repeat'])
+                return redirect('/')
+        else:
+            print(signup_form.errors)     
         signup_form = af.RegistreForm()
     return render(request,template,{'signup_form':signup_form}) 
 
@@ -106,8 +113,9 @@ def reset_password(request):
         form = af.ResetPasswordForm(request.POST,request.FILES)
         if form.is_valid():
             email = form.cleaned_data['email']
-            if am.ClientProfile.objects.filter(email=form.cleaned_data['email']).exists():
-                    user = am.ClientProfile.objects.get(email=email)
+            print(email)
+            if User.objects.filter(email=email).exists():
+                    user = User.objects.get(email=email)
                     subject = "Password Reset Requested"
                     email_template_name = "auth/reset-password-email.html"
                     c = {
@@ -147,3 +155,17 @@ def logout_view(request):
     """
     logout(request)
     return redirect('/login')
+
+
+
+def list_evenements(request):
+    template = 'partenaire/index.html'
+    user = request.user
+    partenaire = am.ClientProfile.objects.get(user=user)
+    services_partner = am.ServicePartenaire.objects.filter(client_profile=partenaire).values('service')
+    services = am.ServiceEvenement.objects.filter(service__in=services_partner)
+    for i in services:
+        print(i.evenement_client.client_profile.user.first_name)
+        print(i.service.nom_service)
+    
+    return render(request, template, {"services": services})

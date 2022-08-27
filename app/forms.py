@@ -27,7 +27,6 @@ class RegistreForm(forms.Form):
     telephone = forms.CharField(max_length=40)
     ville = forms.ChoiceField(choices=VILLE_CHOICES)
     password = forms.PasswordInput()
-    password = PasswordField()
     password_repeat = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 

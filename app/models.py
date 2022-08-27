@@ -53,7 +53,7 @@ class ClientProfile(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user
+        return self.user.email
 
 
 class Service(models.Model):
@@ -85,7 +85,7 @@ class ServicePartenaire(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.service
+        return self.service.nom_service
 
 class ImageServicePartenaire(models.Model):
     service_partenaire = models.ForeignKey(
@@ -97,8 +97,7 @@ class ImageServicePartenaire(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.service_partenaire
+
 
 
 class Evenement(models.Model):
@@ -125,13 +124,13 @@ class EvenementClient(models.Model):
         blank=False)
     nombre_invites = models.PositiveIntegerField(null=False, blank=False, default=1)
     date = models.DateTimeField(blank=False, null=False)
-    ville = models.DateField(blank=False, null=False)
+    ville = models.CharField(blank=False, null=False, max_length=50)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.evenement
+        return self.evenement.nom_evenement
     
 
 class ServiceEvenement(models.Model):
@@ -149,8 +148,7 @@ class ServiceEvenement(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.evenement_client
+
 
 
 class MessageService(models.Model):
@@ -167,6 +165,3 @@ class MessageService(models.Model):
     message = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.evenement_client
