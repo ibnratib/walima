@@ -35,8 +35,7 @@ class Service(models.Model):
     nom_service = models.CharField(
         max_length=200,
         blank=False,
-        null=False,
-        choices=m00.SERVICES_TYPES)
+        null=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -74,8 +73,6 @@ class ImageServicePartenaire(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
-
-
 class EvenementClient(models.Model):
     client_profile = models.ForeignKey(
         ClientProfile,
@@ -98,7 +95,7 @@ class EvenementClient(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.evenement.nom_evenement
+        return self.type_evenement
     
 
 class ServiceEvenement(models.Model):
@@ -115,8 +112,6 @@ class ServiceEvenement(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-
 
 
 class MessageService(models.Model):

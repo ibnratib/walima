@@ -6,6 +6,19 @@ CLIENT_TYPES = [
     ('Partenaire', 'Partenaire')
 ]
 
+VILLES_MAROC = (
+    ('', 'Choisir ville'), ('Tanger', 'Tanger'),
+    ('Agadir', 'Agadir'), ('Béni Mellal', 'Béni Mellal'),
+    ('Chefchaouen', 'Chefchaouen'), ('El Jadida', 'El Jadida'),
+    ('Fés', 'Fés'), ('Kénitra', 'Kénitra'),
+    ('Khémisset', 'Khémisset'), ('Khouribga', 'Khouribga'),
+    ('Marrakech', 'Marrakech'), ('Meknès', 'Meknès'),
+    ('Mohammédia', 'Mohammédia'), ('Nador', 'Nador'),
+    ('Oujda', 'Oujda'), ('Rabat', 'Rabat'),
+    ('Safi', 'Safi'), ('Salé', 'Salé'), ('Taza', 'Taza'),
+    ('Témara', 'Témara'), ('Tétouan', 'Tétouan'),
+    ('Khémisset', 'Khémisset'),)
+
 EVENEMENT_TYPES = [
     ('Marriage', 'Marriage'),
     ('Anniversaire', 'Anniversaire'),
@@ -25,3 +38,5 @@ SERVICES_TYPES = [
     ('Traiteur', 'Traiteur'),
     ('Location de salles', 'Location de salles')
 ]
+
+FORMAT_DATE = '%Y-%m-%d'
