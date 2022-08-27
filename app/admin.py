@@ -7,9 +7,6 @@ from django.contrib import admin
 import app.models as am
 
 # Register your models here.
-@admin.register(am.Evenement)
-class EvenementAdmin(admin.ModelAdmin):
-    pass
 
 @admin.register(am.ClientProfile)
 class ClientAdmin(admin.ModelAdmin):

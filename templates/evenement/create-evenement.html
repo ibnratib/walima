@@ -1,0 +1,352 @@
+{% extends "general/base.html" %}
+{% load i18n %}
+
+{% block body %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<main class="content m-3">
+	<div class="row step_1_ev">
+		<div class="col-12 col-lg-2 col-md-12">	
+		</div>
+		<div class="col-12 col-lg-8 col-md-12">		
+			<h1 id="page_title" class="h3 mb-3">{% trans "Etape 1" %}</h1>
+            <h2 class="h5 mb-3">{% trans "Parlez nous de votre évenement" %}</h2>
+						<div class="card">
+							<div class="card-body">
+								<div class="m-sm-4">
+									<!-- <div class="text-center">
+										<img src="img/avatars/avatar.jpg" alt="Charles Hall" class="img-fluid rounded-circle" width="132" height="132" />
+									</div> -->
+
+									{% if error_message %}
+										<div class="alert alert-danger p-2" role="alert">
+											{{error_message}}
+										</div>
+									{% endif %}
+
+										{% csrf_token %}
+                                        <div class="row">
+                                        <div class="col-12 col-lg-12 col-md-12">	
+                                            <div class="mb-3">
+                                                <label class="form-label">{% trans "Type d'événement" %}</label>
+                                                <select class="form-control" id="type_evenement" name="type_evenement">
+                                                    <option value = ""></option>
+                                                    {% for ev in types_evenements %}
+                                                    <option value="{{ev.0}}">{{ev.0}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-4 col-md-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">{% trans "Ville" %}</label>
+                                                <input type="text" class="form-control" id="ville_ev" name="ville_ev">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-4 col-md-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">{% trans "Date d'événement" %}</label>
+                                                <input type="text" class="date_champ form-control" id="date_ev" name="date_ev">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-4 col-md-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">{% trans "Nombre d'invités" %}</label>
+                                                <input type="number" step="1" class="form-control" id="nombre_invites" name="nombre_invites">
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-5">
+                                            <button id="pass_to_step_2" class="btn btn-sm btn-primary ">{% trans "Suivant" %}</button>
+                                        </div>
+                                        </div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+                    <div class="col-12 col-lg-2 col-md-12">	
+                    </div>
+				</div>
+
+
+
+
+
+
+
+
+                <div class="row step_2_ev" style="display:none;">
+                    <div class="col-12 col-lg-2 col-md-12">	
+                    </div>
+                    <div class="col-12 col-lg-8 col-md-12">		
+                        <h1 id="page_title" class="h3 mb-3">{% trans "Etape 2" %}</h1>
+                        <h2 class="h5 mb-3">{% trans "Que souhaitez-vous inclure dans votre événement ?" %}</h2>
+
+                        <div class="row" id="services_div">
+                        <div class="service_div">
+                        <div class="service_row_rank">Service <span class="service_rank"></span></div>
+                        <div class="col-12 col-lg-12 col-md-12 div_to_hide">	
+                            <div class="mb-3">
+                                <label class="form-label">{% trans "Type de service" %}</label>
+                                <select class="form-control type_service">
+                                    <option value = ""></option>
+                                    {% for ser in types_services %}
+                                        <option value="{{ser.0}}">{{ser.0}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{% trans "Déscription du service souhaité" %}</label>
+                                <textarea rows="6" class="form-control description_service"></textarea>
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                        <div style="text-align:right;">
+                        <button id="ajouter_service_button" style="padding: 4px; padding-right: 10px; padding-left: 10px;" class="btn btn-sm btn-warning ">{% trans "+ Ajouter service" %}</button>
+                        </div>
+                        <div class="text-center mt-5">
+                            <button id="retour_button" class="btn btn-sm btn-default ">{% trans "Retour" %}</button>
+                            <button id="save_evenement" class="btn btn-sm btn-primary ">{% trans "Enregistrer" %}</button>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+			</div>
+		</div>
+	</script>
+</body>
+</html>
+
+
+<style>
+
+
+
+.delete_service
+{
+    display: inline;
+    float: right;
+}
+
+.service_row_rank
+{
+    background: #545967;
+    color: white;
+    font-size: 2em;
+    border-radius: 5px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.description_service
+{
+    resize:none;
+
+}
+
+</style>
+
+
+
+
+<script>
+
+var service_html = `
+<div class="service_div">
+<div class="service_row_rank service_row_rank_1">Service <span class="service_rank"></span><div class="delete_service">&#x2718;</div></div>
+    <div class="col-12 col-lg-12 col-md-12">	
+        <div class="mb-3">
+            <label class="form-label">{% trans "Type de service" %}</label>
+            <select class="form-control type_service">
+                <option value = ""></option>
+                {% for ser in types_services %}
+                    <option value="{{ser.0}}">{{ser.0}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{% trans "Déscription du service souhaité" %}</label>
+            <textarea rows="6" class="form-control description_service"></textarea>
+        </div>
+</div>
+</div>
+`
+
+
+
+// BUTTONS SUIVANT RETOUR
+
+$(document).on("click", "#pass_to_step_2", function(event) {
+    if (step_one_complete())
+    {
+    $(".step_1_ev").hide("")
+    $(".step_2_ev").show("")
+    }else
+    {
+        Swal.fire({
+            icon: 'info',
+            text: "Veuillez remplir tous les champs avant de passer à l'étape suivante",
+        })
+    }
+});
+$(document).on("click", "#retour_button", function(event) {
+    $(".step_1_ev").show("")
+    $(".step_2_ev").hide("")
+});
+
+// REMPLISSAGE DES VARIABLES
+
+var type_evenement = ""
+var ville = ""
+var invitations = ""
+var date_evenement = ""
+
+$(document).on("change", "#type_evenement", function(event) {
+    type_evenement = $(this).val();
+});
+$(document).on("change", "#ville_ev", function(event) {
+    ville = $(this).val();
+});
+$(document).on("change", "#date_ev", function(event) {
+    date_evenement = $(this).val();
+});
+$(document).on("keyup", "#nombre_invites", function(event) {
+    invitations = $(this).val();
+});
+
+
+// AJOUT SUPRESSION DES SERVICES
+
+$(document).on("click", "#ajouter_service_button", function(event) {
+    $("#services_div").append(service_html);
+    rank_services();
+});
+
+$(document).on("click", ".delete_service", function(event) {
+    Swal.fire({
+  title: 'Êtes vous sur?',
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Oui',
+  cancelButtonText: 'Annuler'
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire(
+      'Supprimé!',
+      'Le service a été supprimé avec succès.',
+      'success'
+    )
+    $(this).closest(".service_div").remove();
+    rank_services();
+  }
+})
+    
+});
+
+
+// AJOUT SUPRESSION DES SERVICES
+
+
+$(document).on("click", "#save_evenement", function(event) {
+    Swal.showLoading(Swal.getDenyButton())
+    data_dict={"action":"creer_evenement", "type_evenement": type_evenement, "ville": ville, "invitations": invitations, "date_evenement": date_evenement}
+    $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        url: "{% url 'ajax_calls' %}",
+        data : JSON.stringify(data_dict),
+        success: function (response) {
+            console.log("evenement enregistré")
+            nv_evenement_id = response["nv_evenement_id"];
+            $( ".service_div" ).each(function( index ) {
+                save_service(nv_evenement_id, $(this).find(".type_service").val(), $(this).find(".description_service").text())
+            });
+        }
+    })
+    $(".swal2-container").hide()
+});
+
+
+
+// DECLARATION DES FONCTIONS
+
+function save_service(nv_evenement_id, type_service, description)
+{
+    data_dict={"action":"creer_services_evenement", "nv_evenement_id": nv_evenement_id, "type_service": type_service, "description": description}
+    $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        url: "{% url 'ajax_calls' %}",
+        data : JSON.stringify(data_dict),
+        success: function (response) {
+            console.log("service enregistré")
+        }
+    })
+}
+
+function rank_services()
+{
+    service_rank = 0;
+    $( ".service_rank" ).each(function( index ) {
+        service_rank +=1;
+        $(this).text(service_rank)
+    });
+}
+
+function step_one_complete()
+{
+    if (type_evenement == "" || ville == "" || invitations == "" || date_evenement == "")
+    {
+        return false
+    }else
+    {
+        return true
+    }
+    
+}
+
+function getCookie(c_name)
+	{
+		if (document.cookie.length > 0)
+		{
+			c_start = document.cookie.indexOf(c_name + "=");
+			if (c_start != -1)
+			{
+				c_start = c_start + c_name.length + 1;
+				c_end = document.cookie.indexOf(";", c_start);
+				if (c_end == -1) c_end = document.cookie.length;
+				return unescape(document.cookie.substring(c_start,c_end));
+			}
+		}
+		return "";
+	 }
+
+// CODE LANCE A LA RENTREE DE PAGE
+
+rank_services()
+
+
+</script>
+
+
+{% endblock %}
