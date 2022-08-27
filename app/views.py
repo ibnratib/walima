@@ -62,7 +62,7 @@ def login(request, type_client):
                         if client.type_client == 'Partenaire':
                             return redirect('list_evenements')
                         else:
-                            return redirect('/')
+                            return redirect('creer_evenement')
                         
                     else:
                        return render(request, template, {'login_form': login_form,'error_message': "Vous avez entré un email ou un mot de passe invalide"})
@@ -108,7 +108,11 @@ def register(request, type_client):
                 user = authenticate(
                     request , username=signup_form.cleaned_data['email'],
                      password=signup_form.cleaned_data['password_repeat'])
-                return redirect('/')
+                auth_login(request, user)
+                if client.type_client == 'Partenaire':
+                    return redirect('list_evenements')
+                else:
+                    return redirect('creer_evenement')
         else:
             print(signup_form.errors)     
         signup_form = af.RegistreForm()
