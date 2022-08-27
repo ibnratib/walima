@@ -73,7 +73,7 @@
 						<div class="text-center mt-3">
 							<button type="submit" id="ajax_button" class="btn btn-primary" disabled>{% trans "Sign Up" %}</button>
 						</div>
-						<p  style="text-align:right !important; margin-bottom:0px; margin-top:5px" class="text-right"><a href="/login/">Vous avez déja un compte ? Identifiez vous</a></p>
+						<p  style="text-align:right !important; margin-bottom:0px; margin-top:5px" class="text-right"><a id="login" href="/login/">Vous avez déja un compte ? Identifiez vous</a></p>
 
 					</div>
 				</div>
@@ -93,6 +93,11 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <script>
+
+var url = window.location.href;
+var type_client = url.split("/")[4]
+
+$("#login").attr("href", "/login/"+type_client+"")
 
 var identical_password=0;
 
