@@ -22,8 +22,8 @@ urlpatterns=[
     #////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #//////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
-    path("login/", av.login,name='login'),
-    path("inscription/", av.register,name='register'),
+    path("login/<str:type_client>", av.login,name='login'),
+    path("inscription/<str:type_client>", av.register,name='register'),
     path('log-out/', av.logout_view, name="logout_view"),
     path('reset-password/', av.reset_password, name='reset_password'),
     path('reset-password-sent/', av.reset_password_sent, name='reset_password_sent'),

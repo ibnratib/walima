@@ -43,7 +43,7 @@
 									</form>
 									<div class="row mt-3">
 										<div class="col p-3 m-1 border border-success rounded">
-											<a href="{% url 'register'%}" >{% trans "Pas encore de compte ? S'inscrire" %}</a>
+											<a href="" id="register" >{% trans "Pas encore de compte ? S'inscrire" %}</a>
 										</div>
 										<div class="col p-3 m-1 border border-success rounded">
 											<a href="{% url 'reset_password' %}">{% trans "Mot de passe oublié" %}</a>
@@ -60,4 +60,10 @@
 	</script>
 </body>
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script>
+var url = window.location.href;
+var type_client = url.split("/")[4]
+$("#register").attr("href", "/inscription/"+type_client+"")
+</script>
 {% endblock %}

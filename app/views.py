@@ -1,4 +1,5 @@
 # IMPORTATION GENERAL
+from http import client
 import json
 from xml.dom import UserDataHandler
 from datetime import date, datetime
@@ -20,6 +21,15 @@ import app.m00_common as m00
 
 def accueil(request):
     template = "index.html"
+    if request.user and not request.user.is_superuser:
+        type_client = am.ClientProfile.objects.get(
+            user=request.user).type_client
+        if type_client == 'Client':
+            return redirect('creer_evenement')
+        elif type_client == 'Partenaire':
+            return redirect('list_evenements')
+        else:
+            pass
     return render(request, template, {})
 
 
@@ -31,7 +41,7 @@ def accueil(request):
 #######################################################################################
 #######################################################################################
 #######################################################################################
-def login(request):
+def login(request, type_client):
     template = 'auth/login.html'
     login_form = af.LoginForm()
     error_message = ''
@@ -52,7 +62,7 @@ def login(request):
                         if client.type_client == 'Partenaire':
                             return redirect('list_evenements')
                         else:
-                            return redirect('/')
+                            return redirect('creer_evenement')
                         
                     else:
                        return render(request, template, {'login_form': login_form,'error_message': "Vous avez entré un email ou un mot de passe invalide"})
@@ -61,7 +71,7 @@ def login(request):
     return render(request, template, {'login_form':login_form, 'user':user})
    
 
-def register(request):
+def register(request, type_client):
     template = 'auth/register.html'
     error_message = ''
     signup_form = af.RegistreForm() 
@@ -85,18 +95,24 @@ def register(request):
                     username=signup_form.cleaned_data['email']
                 )
                 user.save()
-                #creation de pharmacie
+                #creation de client
                 ville = signup_form.cleaned_data['ville']
                 telephone = signup_form.cleaned_data['telephone']                
-                pharmacie = am.ClientProfile()
-                pharmacie.telephone_mobile=telephone
-                pharmacie.ville = ville
-                pharmacie.user = user
-                pharmacie.save()                
+                client = am.ClientProfile()
+                client.telephone_mobile=telephone
+                client.ville = ville
+                client.type_client = type_client
+                client.user = user
+                
+                client.save()                
                 user = authenticate(
                     request , username=signup_form.cleaned_data['email'],
                      password=signup_form.cleaned_data['password_repeat'])
-                return redirect('/')
+                auth_login(request, user)
+                if client.type_client == 'Partenaire':
+                    return redirect('list_evenements')
+                else:
+                    return redirect('creer_evenement')
         else:
             print(signup_form.errors)     
         signup_form = af.RegistreForm()
