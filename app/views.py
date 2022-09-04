@@ -27,7 +27,7 @@ def accueil(request):
         if type_client == 'Client':
             return redirect('creer_evenement')
         elif type_client == 'Partenaire':
-            return redirect('list_evenements')
+            return redirect('liste_evenements')
         else:
             pass
     return render(request, template, {})
@@ -60,7 +60,7 @@ def login(request, type_client):
                         auth_login(request, user)
                         client=am.ClientProfile.objects.get(user=user)
                         if client.type_client == 'Partenaire':
-                            return redirect('list_evenements')
+                            return redirect('liste_evenements')
                         else:
                             return redirect('creer_evenement')
                         
@@ -110,7 +110,7 @@ def register(request, type_client):
                      password=signup_form.cleaned_data['password_repeat'])
                 auth_login(request, user)
                 if client.type_client == 'Partenaire':
-                    return redirect('list_evenements')
+                    return redirect('liste_evenements')
                 else:
                     return redirect('creer_evenement')
         else:
@@ -175,16 +175,18 @@ def logout_view(request):
     return redirect('/login')
 
 
+def liste_evenements(request):
+    """
+    la fonction qui permet de lister les evenements qui concernent un
+    utilisateur
+    """
 
-
-def list_evenements(request):
     template = 'partenaire/index.html'
     user = request.user
     partenaire = am.ClientProfile.objects.get(user=user)
-    services_partner = am.ServicePartenaire.objects.filter(client_profile=partenaire).values('service')
-    services = am.ServiceEvenement.objects.filter(service__in=services_partner)
+    services_partner = am.ServicePartenaire.objects.all()
+    services = am.ServiceEvenement.objects.all()
 
-    
     return render(request, template, {"services": services})
 
 
@@ -192,7 +194,6 @@ def creer_evenement(request):
     """
     la fonction creer evenement pour creer un evenement
     """
-
 
     types_evenements = m00.EVENEMENT_TYPES
     types_services = am.Service.objects.all()
