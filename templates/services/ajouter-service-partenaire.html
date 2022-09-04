@@ -1,0 +1,42 @@
+{% extends "general/base.html" %}
+{% load i18n %}
+
+{% block body %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<div class="container">
+    <div class="text-center"><h3>{% trans "Créer un nouveau service" %}</h3></div>
+        <div class="m-sm-4">
+
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 col-lg-12 col-md-12 mb-3">	
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{form}}
+                            </div>
+                            <button class="btn btn-success" type="submit" name="description">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    if("{{message_error}}"){
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: "{{message_error}}",
+        })
+    }
+</script>
+
+{% endblock %}

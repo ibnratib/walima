@@ -13,6 +13,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+
 
 # IMPORTATION APP
 import app.forms as af
@@ -21,15 +23,19 @@ import app.m00_common as m00
 
 def accueil(request):
     template = "index.html"
-    if request.user and not request.user.is_superuser:
-        type_client = am.ClientProfile.objects.get(
-            user=request.user).type_client
-        if type_client == 'Client':
-            return redirect('creer_evenement')
-        elif type_client == 'Partenaire':
-            return redirect('list_evenements')
-        else:
-            pass
+    try:
+        if request.user:
+            if not request.user.is_superuser:
+                type_client = am.ClientProfile.objects.get(
+                    user=request.user).type_client
+                if type_client == 'Client':
+                    return redirect('creer_evenement')
+                elif type_client == 'Partenaire':
+                    return redirect('list_evenements')
+                else:
+                    pass
+    except:
+        pass
     return render(request, template, {})
 
 
@@ -172,7 +178,7 @@ def logout_view(request):
     la fonction logout_view permet à un utilisateur de se déconnecter
     """
     logout(request)
-    return redirect('/login')
+    return redirect('/')
 
 
 
@@ -225,5 +231,57 @@ def ajax_calls(request):
 
             nv_evenement_id = received_json_data['nv_evenement_id']
             data_dict = {}
+        if action == 'supprimer_service':
+            id = received_json_data['id']
+            am.ServicePartenaire.objects.filter(id=id).delete()
+            data_dict = {}
 
     return JsonResponse(data=data_dict, safe=False)
+
+
+@login_required(login_url='/')
+def partenaire_service(request):
+    template = 'services/services-partenaire.html'
+    client_profile = am.ClientProfile.objects.get(user=request.user)
+    type_client = client_profile.type_client
+    liste_services = am.ServicePartenaire.objects.filter(
+        client_profile=client_profile)
+    return render(request, template,{
+        "liste_services": liste_services,
+        'type_client': type_client
+        })
+
+@login_required(login_url='/')
+def ajouter_service_partenaire(request):
+    template = 'services/ajouter-service-partenaire.html'
+    form = af.ServicePartenaireForm()
+
+    client_profile = am.ClientProfile.objects.get(user=request.user)
+    type_client = client_profile.type_client
+    if request.method == 'POST':
+        form = af.ServicePartenaireForm(request.POST ,request.FILES)
+        if form.is_valid():
+            service = form.cleaned_data['service']
+            description = form.cleaned_data['description_de_service']
+            images = form.cleaned_data['image_de_service']
+
+            if am.ServicePartenaire.objects.filter(
+                client_profile=client_profile, service=service).exists():
+                return render(request, template,{
+                    'form': form, "message_error": "le service existe déjà !",
+                    'type_client': type_client})
+            service_partenaire = am.ServicePartenaire()
+            service_partenaire.client_profile = client_profile
+            service_partenaire.service = service
+            service_partenaire.description = description
+            service_partenaire.save()
+            for image in request.FILES.getlist('image_de_service'):
+                am.ImageServicePartenaire.objects.create(
+                    image=image,
+                    service_partenaire=service_partenaire)
+            return redirect('/services-partenaire')
+            
+        else:
+            print(form.errors)
+    return render(request, template,{
+        'form': form,'type_client': type_client})

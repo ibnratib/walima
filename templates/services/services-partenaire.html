@@ -1,0 +1,143 @@
+{% extends "general/base.html" %}
+{% load i18n %}
+
+{% block body %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container">
+  <div class="text-center"><h3>{% trans "Liste de services" %}</h3></div>
+  <div class="m-sm-4">
+    {% if liste_services %}
+      {% for service in liste_services %}
+        <div class="card mb-3 service_{{service.id}}">
+            <div class="row g-0">
+
+              <div class="col-md-4">
+                <div id="carouselExampleControls{{service.id}}" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    {% for image in service.get_images %}
+                    {% if forloop.first %}
+                    <div class="carousel-item active">
+                    {% else %}
+                    <div class="carousel-item">
+                    {% endif %}
+                      <img src="{{ image.image.url }}" class="d-block w-100" alt="...">
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls{{service.id}}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls{{service.id}}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{service.service.nom_service}}</h5>
+                  <p class="card-text">{{service.description}}</p>
+                  <button class="btn btn-danger btn-sm text-end supprimer_event" value="{{service.id}}"> supprimer</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        <div class="text-end mt-3"><a href="{% url 'ajouter_service_partenaire' %}" class="btn btn-primary btn-sm"> {% trans "Ajouter nouveau service"%}</a></div>
+      {% else %}
+        <div class="alert alert-danger">Vous n'avez créé aucun service !</div>
+        <div class="text-center mt-3"><a href="{% url 'ajouter_service_partenaire' %}" class="btn btn-primary btn-sm"> {% trans "Ajouter nouveau service"%}</a></div>
+      {% endif %}
+  </div>
+
+</div>
+
+
+
+
+
+<script>
+  
+
+
+$(document).on("click", ".supprimer_event", function(event) {
+
+      var id = $(this).val()
+      Swal.fire({
+  title: 'Êtes vous sur?',
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Oui',
+  cancelButtonText: 'Annuler'
+}).then((result) => {
+
+      if (result.isConfirmed) {
+      console.log()
+      data_dict={"action":"supprimer_service", "id": id}
+      $.ajax({
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          url: "{% url 'ajax_calls' %}",
+          data : JSON.stringify(data_dict),
+          success: function (response) {
+            $('.service_'+id+'').hide()
+            Swal.fire(
+            'Deleted!',
+            'le service a été bien supprimé !',
+            'success'
+          )
+          }
+      })
+      }
+
+
+    })
+  })
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+$(document).on("click", "supprimer_event", function(event) {
+    Swal.showLoading(Swal.getDenyButton())
+    data_dict={"action":"creer_evenement", "type_evenement": type_evenement, "ville": ville, "invitations": invitations, "date_evenement": date_evenement}
+    $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        url: "{% url 'ajax_calls' %}",
+        data : JSON.stringify(data_dict),
+        success: function (response) {
+            console.log("evenement enregistré")
+            nv_evenement_id = response["nv_evenement_id"];
+            $( ".service_div" ).each(function( index ) {
+                save_service(nv_evenement_id, $(this).find(".type_service").val(), $(this).find(".description_service").text())
+            });
+        }
+    })
+    $(".swal2-container").hide()
+});
+
+</script>
+
+{% endblock %}

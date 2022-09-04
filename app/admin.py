@@ -32,3 +32,7 @@ class MessageServiceAdmin(admin.ModelAdmin):
 class EvenementClientAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(am.ImageServicePartenaire)
+class ImageServicePartenaireAdmin(admin.ModelAdmin):
+    pass
+
