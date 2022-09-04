@@ -60,6 +60,9 @@ class ServicePartenaire(models.Model):
 
     def __str__(self):
         return self.service.nom_service
+    
+    def get_images(self):
+        return ImageServicePartenaire.objects.filter(service_partenaire=self)
 
 
 class ImageServicePartenaire(models.Model):
