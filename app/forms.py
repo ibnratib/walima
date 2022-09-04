@@ -7,27 +7,16 @@ from django.db.models import Q
 from zxcvbn_password import zxcvbn
 from zxcvbn_password.fields import PasswordField, PasswordConfirmationField
 
+# Importations application
+import app.m00_common as m00
 import app.models as am
-
-VILLE_CHOICES = (
-    ('', 'Choisir ville'), ('Tanger', 'Tanger'),
-    ('Agadir', 'Agadir'), ('Béni Mellal', 'Béni Mellal'),
-    ('Chefchaouen', 'Chefchaouen'), ('El Jadida', 'El Jadida'),
-    ('Fés', 'Fés'), ('Kénitra', 'Kénitra'),
-    ('Khémisset', 'Khémisset'), ('Khouribga', 'Khouribga'),
-    ('Marrakech', 'Marrakech'), ('Meknès', 'Meknès'),
-    ('Mohammédia', 'Mohammédia'), ('Nador', 'Nador'),
-    ('Oujda', 'Oujda'), ('Rabat', 'Rabat'),
-    ('Safi', 'Safi'), ('Salé', 'Salé'), ('Taza', 'Taza'),
-    ('Témara', 'Témara'), ('Tétouan', 'Tétouan'),
-    ('Khémisset', 'Khémisset'),)
 
 
 class RegistreForm(forms.Form):
     user_name = forms.CharField(max_length=200)
     email = forms.EmailField(max_length=200)
     telephone = forms.CharField(max_length=40)
-    ville = forms.ChoiceField(choices=VILLE_CHOICES)
+    ville = forms.ChoiceField(choices=m00.VILLES_MAROC)
     password = forms.PasswordInput()
     password_repeat = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -61,7 +50,7 @@ class ResetPasswordForm(forms.Form):
 class ServicePartenaireForm(forms.Form):
     service = forms.ModelChoiceField(queryset=am.Service.objects.all())
     description_de_service = forms.CharField(widget=forms.Textarea(attrs={}))
-    image_de_service = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    images_de_service = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     
 
     def __init__(self, *args, **kwargs):

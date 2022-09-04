@@ -2,7 +2,7 @@
 from http import client
 import json
 from xml.dom import UserDataHandler
-
+from datetime import date, datetime
 # IMPORTATION DJANGO
 from django.shortcuts import render, redirect, HttpResponse
 from django.utils.http import urlsafe_base64_encode
@@ -201,11 +201,12 @@ def creer_evenement(request):
 
 
     types_evenements = m00.EVENEMENT_TYPES
-    types_services = m00.SERVICES_TYPES
-
+    types_services = am.Service.objects.all()
+    villes_maroc = m00.VILLES_MAROC
     context = {
         "types_evenements": types_evenements,
-        "types_services": types_services
+        "types_services": types_services,
+        "villes_maroc": villes_maroc
     }
     return render(request, 'evenement/create-evenement.html', context)
 
@@ -218,10 +219,10 @@ def ajax_calls(request):
         if action == "creer_evenement":
 
             nv_evenement = am.EvenementClient()
-            nv_evenement.client_profile = request.user.client_profile()
+            nv_evenement.client_profile = request.user.client_profile
             nv_evenement.type_evenement = received_json_data['type_evenement']
             nv_evenement.nombre_invites = received_json_data['invitations']
-            nv_evenement.date = received_json_data['date_evenement']
+            nv_evenement.date = datetime.strptime(str(received_json_data['date_evenement']), "%m/%d/%Y")
             nv_evenement.ville = received_json_data['ville']
 
             nv_evenement.save()
@@ -230,6 +231,14 @@ def ajax_calls(request):
         if action == "creer_services_evenement":
 
             nv_evenement_id = received_json_data['nv_evenement_id']
+
+            nv_service_evenement = am.ServiceEvenement()
+            nv_service_evenement.evenement_client =\
+                am.EvenementClient.objects.get(id=nv_evenement_id)
+            nv_service_evenement.service = am.Service.objects.get(
+                id=received_json_data['type_service'])
+            nv_service_evenement.description = received_json_data['description']
+            nv_service_evenement.save()
             data_dict = {}
         if action == 'supprimer_service':
             id = received_json_data['id']

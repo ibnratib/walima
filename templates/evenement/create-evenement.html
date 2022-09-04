@@ -42,7 +42,11 @@
                                         <div class="col-12 col-lg-4 col-md-12">
                                             <div class="mb-3">
                                                 <label class="form-label">{% trans "Ville" %}</label>
-                                                <input type="text" class="form-control" id="ville_ev" name="ville_ev">
+                                                <select class="form-control" id="ville_ev" name="ville_ev">
+                                                    {% for ville in villes_maroc %}
+                                                    <option value="{{ville.0}}">{{ville.0}}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-12 col-lg-4 col-md-12">
@@ -94,7 +98,7 @@
                                 <select class="form-control type_service">
                                     <option value = ""></option>
                                     {% for ser in types_services %}
-                                        <option value="{{ser.0}}">{{ser.0}}</option>
+                                        <option value="{{ser.id}}">{{ser.nom_service}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -142,7 +146,7 @@
 
 .service_row_rank
 {
-    background: #545967;
+    background: #005555;
     color: white;
     font-size: 2em;
     border-radius: 5px;
@@ -274,11 +278,17 @@ $(document).on("click", "#save_evenement", function(event) {
         url: "{% url 'ajax_calls' %}",
         data : JSON.stringify(data_dict),
         success: function (response) {
-            console.log("evenement enregistré")
             nv_evenement_id = response["nv_evenement_id"];
             $( ".service_div" ).each(function( index ) {
-                save_service(nv_evenement_id, $(this).find(".type_service").val(), $(this).find(".description_service").text())
+                save_service(nv_evenement_id, $(this).find(".type_service").val(), $(this).find(".description_service").val())
             });
+            Swal.fire({
+                position: 'center-center',
+                icon: 'success',
+                title: 'Votre événement a été enregistré avec succès',
+                showConfirmButton: false,
+                timer: 1500
+            })
         }
     })
     $(".swal2-container").hide()
@@ -299,7 +309,6 @@ function save_service(nv_evenement_id, type_service, description)
         url: "{% url 'ajax_calls' %}",
         data : JSON.stringify(data_dict),
         success: function (response) {
-            console.log("service enregistré")
         }
     })
 }
