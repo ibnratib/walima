@@ -120,7 +120,11 @@ $(document).on("click", "#envoyer_message", function(event) {
 });
 
 
-get_messages();
+setInterval(function () {
+    get_messages();
+    },1000);
+
+
 
 
 function get_messages()

@@ -74,7 +74,7 @@
       <div class="row justify-content-center align-items-center">
         <div class="col-lg-9 text-center">
           <h1 class="heading" data-aos="fade-up">
-            Easiest way to find your dream home
+            {% trans "L'outil le plus efficace pour génrer vos événements" %}
           </h1>
           <form
             action="#"
@@ -87,8 +87,8 @@
               class="form-control px-4"
               placeholder="Your ZIP code or City. e.g. New York"
             /> -->
-            <a class="btn btn-primary m-3" href="{% url 'register' 'Client' %}">{% trans "Creer annonce" %} </a>
-            <a class="btn btn-outline-primary m-3" href="{% url 'register' 'Partenaire' %}">{% trans "Consulter annonces" %} </a>
+            <a class="btn btn-primary m-3" href="{% url 'register' 'Client' %}">{% trans "Créer événement" %} </a>
+            <a class="btn btn-outline-primary m-3" href="{% url 'register' 'Partenaire' %}">{% trans "Consulter événnements" %} </a>
           </form>
         </div>
       </div>
