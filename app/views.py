@@ -257,17 +257,29 @@ def ajax_calls(request):
 
             service = am.ServiceEvenement.objects.get(
                 id=received_json_data['service'])
+            
+            if int(received_json_data['other_person']) == 0:
+                other_person = request.user.client_profile
 
-            other_person = am.ClientProfile.objects.get(
-                id=received_json_data['other_person'])
+                messages = am.MessageService.objects.filter(
+                    (Q(message_sender=request.user.client_profile.id) | Q(message_receiver = request.user.client_profile.id)),
+                    service_evenement=service
+                    )
+                list_of_senders = list(set([m.message_sender for m in messages]))
+                messages=[]
 
-            messages = am.MessageService.objects.filter(
-                (Q(message_sender=request.user.client_profile.id) | Q(message_receiver = request.user.client_profile.id)),
-                (Q(message_sender=other_person) | Q(message_receiver = other_person)),
-                service_evenement=service
-                )
+            else:
+                other_person = am.ClientProfile.objects.get(
+                    id=received_json_data['other_person'])
+                messages = am.MessageService.objects.filter(
+                    (Q(message_sender=request.user.client_profile.id) | Q(message_receiver = request.user.client_profile.id)),
+                    (Q(message_sender=other_person) | Q(message_receiver = other_person)),
+                    service_evenement=service
+                    )
+                list_of_senders = list(set([m.message_sender for m in messages]))
+                
 
-            list_of_senders = list(set([m.message_sender for m in messages]))
+            
             
             html_senders = render_to_string(
                 template_name="services/liste-senders.html",
@@ -344,7 +356,6 @@ def ajouter_service_partenaire(request):
         if form.is_valid():
             service = form.cleaned_data['service']
             description = form.cleaned_data['description_de_service']
-            images = form.cleaned_data['image_de_service']
 
             if am.ServicePartenaire.objects.filter(
                 client_profile=client_profile, service=service).exists():
@@ -356,7 +367,7 @@ def ajouter_service_partenaire(request):
             service_partenaire.service = service
             service_partenaire.description = description
             service_partenaire.save()
-            for image in request.FILES.getlist('image_de_service'):
+            for image in request.FILES.getlist('images_de_service'):
                 am.ImageServicePartenaire.objects.create(
                     image=image,
                     service_partenaire=service_partenaire)
