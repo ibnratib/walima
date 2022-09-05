@@ -31,7 +31,7 @@ def accueil(request):
                 if type_client == 'Client':
                     return redirect('creer_evenement')
                 elif type_client == 'Partenaire':
-                    return redirect('liste_evenements')
+                    return redirect('liste_services')
                 else:
                     pass
     except:
@@ -66,7 +66,7 @@ def login(request, type_client):
                         auth_login(request, user)
                         client=am.ClientProfile.objects.get(user=user)
                         if client.type_client == 'Partenaire':
-                            return redirect('liste_evenements')
+                            return redirect('liste_services')
                         else:
                             return redirect('creer_evenement')
                         
@@ -116,7 +116,7 @@ def register(request, type_client):
                      password=signup_form.cleaned_data['password_repeat'])
                 auth_login(request, user)
                 if client.type_client == 'Partenaire':
-                    return redirect('liste_evenements')
+                    return redirect('liste_services')
                 else:
                     return redirect('creer_evenement')
         else:
@@ -181,7 +181,7 @@ def logout_view(request):
     return redirect('/')
 
 
-def liste_evenements(request):
+def liste_services(request):
     """
     la fonction qui permet de lister les evenements qui concernent un
     utilisateur
@@ -190,10 +190,23 @@ def liste_evenements(request):
     template = 'partenaire/index.html'
     user = request.user
     partenaire = am.ClientProfile.objects.get(user=user)
-    services_partner = am.ServicePartenaire.objects.all()
-    services = am.ServiceEvenement.objects.all()
+    services_partner = am.ServicePartenaire.objects.filter(
+        client_profile=request.user.client_profile)
+    print(services_partner)
+    services = am.ServiceEvenement.objects.filter()
 
     return render(request, template, {"services": services})
+
+
+def detail_service(request, pk):
+    """
+    Ici, les clients et partenaires peuvent consulter le détail d'un service
+    demandé avec possibilité de discussion
+    """
+
+    service = am.ServiceEvenement.objects.get(id=pk)
+    template = 'services/details.html'
+    return render(request, template, {"service": service})
 
 
 def creer_evenement(request):
