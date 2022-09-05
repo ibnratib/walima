@@ -34,14 +34,22 @@
                 </li>
               </ul>
             </li> -->
-            {% if type_client == 'Partenaire'  %}
-              <li><a href="{% url 'partenaire_service' %}">Services</a></li>
-              <li><a href="{% url 'logout_view' %}">Déconnecte</a></li>
+            {% if  request.user.client_profile.type_client == 'Partenaire'  %}
+
+              <li><a href="{% url 'partenaire_service' %}">Mes services</a></li>
+              <li><a href="{% url 'liste_services' %}">Consulter annonces</a></li>
+              <li><a href="{% url 'logout_view' %}">Se déconnecte</a></li>
               <!-- <li><a href="about.html">About</a></li> -->
-            {% else %}           
-            <li><a href="services.html">Services</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="inscription">{% trans "Inscriptions" %}</a></li>      
+            {% elif request.user.client_profile.type_client == 'Client' %} 
+
+            <li><a href="{% url 'liste_services' %}">Mes annonces</a></li>
+            <li><a href="{% url 'creer_evenement' %}">Créer annonce</a></li>
+            <li><a href="{% url 'logout_view' %}">Se déconnecte</a></li>
+
+            {% else %}
+            <!-- <li><a href="services.html">Services</a></li> -->
+            <li><a href="#">About</a></li>
+            <!-- <li><a href="inscription">{% trans "Inscriptions" %}</a></li>       -->
             {% endif %}
 
           </ul>

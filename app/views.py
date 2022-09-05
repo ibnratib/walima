@@ -80,6 +80,7 @@ def login(request, type_client):
 def register(request, type_client):
     template = 'auth/register.html'
     error_message = ''
+    print(type_client)
     signup_form = af.RegistreForm() 
     if request.method == 'POST':
         signup_form = af.RegistreForm(request.POST,request.FILES)

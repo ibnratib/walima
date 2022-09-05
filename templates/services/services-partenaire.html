@@ -104,40 +104,6 @@ $(document).on("click", ".supprimer_event", function(event) {
     })
   })
 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-$(document).on("click", "supprimer_event", function(event) {
-    Swal.showLoading(Swal.getDenyButton())
-    data_dict={"action":"creer_evenement", "type_evenement": type_evenement, "ville": ville, "invitations": invitations, "date_evenement": date_evenement}
-    $.ajax({
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        type: 'POST',
-        processData: false,
-        contentType: false,
-        url: "{% url 'ajax_calls' %}",
-        data : JSON.stringify(data_dict),
-        success: function (response) {
-            console.log("evenement enregistré")
-            nv_evenement_id = response["nv_evenement_id"];
-            $( ".service_div" ).each(function( index ) {
-                save_service(nv_evenement_id, $(this).find(".type_service").val(), $(this).find(".description_service").text())
-            });
-        }
-    })
-    $(".swal2-container").hide()
-});
-
 </script>
 
 {% endblock %}
