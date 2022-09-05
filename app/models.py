@@ -8,6 +8,7 @@ import app.m00_common as m00
 
 # Create your models here.
 
+
 class ClientProfile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='client_profile')
@@ -123,11 +124,16 @@ class MessageService(models.Model):
         on_delete=models.CASCADE,
         null=False,
         blank=False)
-    profil_client = models.ForeignKey(
+    message_sender = models.ForeignKey(
         ClientProfile,
         on_delete=models.CASCADE,
         null=False,
-        blank=False)
+        blank=False, related_name='message_sender')
+    message_receiver = models.ForeignKey(
+        ClientProfile,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False, related_name='message_receiver')
     message = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

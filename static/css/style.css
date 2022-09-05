@@ -2116,6 +2116,13 @@ textarea.form-control-lg {
     filter: none;
     opacity: 0.65; }
 
+
+.m-3
+{
+  margin:0 !important;
+  margin-top:150px !important;
+}
+
 .form-range {
   width: 100%;
   height: 1.5rem;
@@ -6464,7 +6471,8 @@ textarea.form-control-lg {
   margin: 0.5rem !important; }
 
 .m-3 {
-  margin: 1rem !important; }
+  margin: 1rem !important;
+  margin-top:150px !important; }
 
 .m-4 {
   margin: 1.5rem !important; }

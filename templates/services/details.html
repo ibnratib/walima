@@ -1,0 +1,164 @@
+{% extends "general/base.html" %}
+{% load i18n %}
+
+{% block body %}
+
+<main class="content m-3">
+	<div class="row">
+		<div id="list_senders" class="col-2 col-lg-2 col-md-2">
+		</div>
+		<div class="col-10 col-lg-10 col-md-10">		
+			<h1 id="page_title" class="h3 mb-3">{% trans "Détails sur le service" %}</h1>
+			<div class="card mb-3">
+				<div class="card-body">
+					<div class="mb-3">
+						<h6>Type du service demandé:</h6>
+						{{service.service.nom_service}}
+					</div>
+					<div class="row mb-3">
+						<div class="col-12 col-lg-3 col-md-12">	
+							<h6>Type événement</h6>
+							{{service.evenement_client.type_evenement}}
+						</div>
+						<div class="col-12 col-lg-3 col-md-12">	
+							<h6>Nombre d'invités</h6>
+							{{service.evenement_client.nombre_invites}} personnes
+						</div>
+						<div class="col-12 col-lg-3 col-md-12">	
+							<h6>Date</h6>
+							{{service.evenement_client.date|date:"M d, Y"}}
+						</div>
+						<div class="col-12 col-lg-3 col-md-12">	
+							<h6>Ville</h6>
+							{{service.evenement_client.ville}}
+						</div>
+					</div>
+					<div class="mb-3">
+						<h6>Déscriptin du service demandé:</h6>
+						{{service.description}}
+					</div>
+				</div>
+			</div>
+			<div style="max-height: 300px; overflow-y: auto;" id="chat_area" class="mb-3">
+
+			</div>
+			<div style="border: none;" class="card mb-3">
+					<textarea id="message_to_send" placeholder="Envoyer un message au annonceur" style="resize:none;" class="mb-3 form-control" rows="2"></textarea>
+					<div style="text-align:right;"><button style="padding: 4px; padding-right: 10px; padding-left: 10px;" id="envoyer_message" class="btn btn-success btn-sm">Envoyer</button></div>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>
+
+<script>
+    function getCookie(c_name)
+  {
+      if (document.cookie.length > 0)
+      {
+          c_start = document.cookie.indexOf(c_name + "=");
+          if (c_start != -1)
+          {
+              c_start = c_start + c_name.length + 1;
+              c_end = document.cookie.indexOf(";", c_start);
+              if (c_end == -1) c_end = document.cookie.length;
+              return unescape(document.cookie.substring(c_start,c_end));
+          }
+      }
+      return "";
+   }
+  </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script>
+
+var type_profil = "{{request.user.client_profile.type_client}}"
+
+var chosen_partenaire = 0
+
+$(document).on("click", ".sender_div", function(event) {
+
+	chosen_partenaire = $(this).attr("class").split(" ")[1];
+	get_messages();
+
+});
+
+
+// AJOUT SUPRESSION DES SERVICES
+
+$(document).on("click", "#envoyer_message", function(event) {
+    message = $("#message_to_send").val()
+	
+	
+
+	if (type_profil == "Partenaire")
+	{
+		sender = "{{request.user.client_profile.id}}"
+		receiver = "{{service.evenement_client.client_profile.id}}"
+
+	}else if (type_profil == "Client")
+	{
+		sender = "{{request.user.client_profile.id}}"
+		receiver = chosen_partenaire
+	}
+	
+	data_dict={"action":"envoyer_message_sur_evenement", "message":message, "service": "{{service.id}}", "sender": sender, "receiver": receiver}
+    $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        url: "{% url 'ajax_calls' %}",
+        data : JSON.stringify(data_dict),
+        success: function (response) {
+			$("#message_to_send").val("");
+			get_messages();
+        }
+    })
+
+});
+
+
+get_messages();
+
+
+function get_messages()
+{
+
+	if (type_profil == "Partenaire")
+	{
+		other_person = "{{service.evenement_client.client_profile.id}}"
+	}else if (type_profil == "Client")
+	{
+		other_person = chosen_partenaire
+	}
+
+	data_dict={"action":"get_messages_service", "service": "{{service.id}}", "other_person": other_person}
+    $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        url: "{% url 'ajax_calls' %}",
+        data : JSON.stringify(data_dict),
+        success: function (response) {
+			$("#chat_area").html(response['html_conversation']);
+			$("#list_senders").html(response['html_senders']);
+			scroll_down_the_chat();
+        }	
+    })
+}
+
+
+function scroll_down_the_chat()
+    {
+        $("#chat_area").animate({ scrollTop: $('#chat_area').prop("scrollHeight")}, 1000);
+    }
+
+
+</script>
+
+
+
+{% endblock %}

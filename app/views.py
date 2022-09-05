@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, logout, login as auth_login
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 
 # IMPORTATION APP
 import app.forms as af
@@ -31,7 +31,7 @@ def accueil(request):
                 if type_client == 'Client':
                     return redirect('creer_evenement')
                 elif type_client == 'Partenaire':
-                    return redirect('list_evenements')
+                    return redirect('liste_services')
                 else:
                     pass
     except:
@@ -66,7 +66,7 @@ def login(request, type_client):
                         auth_login(request, user)
                         client=am.ClientProfile.objects.get(user=user)
                         if client.type_client == 'Partenaire':
-                            return redirect('list_evenements')
+                            return redirect('liste_services')
                         else:
                             return redirect('creer_evenement')
                         
@@ -80,6 +80,7 @@ def login(request, type_client):
 def register(request, type_client):
     template = 'auth/register.html'
     error_message = ''
+    print(type_client)
     signup_form = af.RegistreForm() 
     if request.method == 'POST':
         signup_form = af.RegistreForm(request.POST,request.FILES)
@@ -116,7 +117,7 @@ def register(request, type_client):
                      password=signup_form.cleaned_data['password_repeat'])
                 auth_login(request, user)
                 if client.type_client == 'Partenaire':
-                    return redirect('list_evenements')
+                    return redirect('liste_services')
                 else:
                     return redirect('creer_evenement')
         else:
@@ -181,24 +182,47 @@ def logout_view(request):
     return redirect('/')
 
 
+def liste_services(request):
+    """
+    la fonction qui permet de lister les evenements qui concernent un
+    utilisateur
+    """
 
-
-def list_evenements(request):
     template = 'partenaire/index.html'
-    user = request.user
-    partenaire = am.ClientProfile.objects.get(user=user)
-    services_partner = am.ServicePartenaire.objects.filter(client_profile=partenaire).values('service')
-    services = am.ServiceEvenement.objects.filter(service__in=services_partner)
 
+    client_profile = request.user.client_profile
     
+    if client_profile.type_client == 'Partenaire':
+        services_partner = list(am.ServicePartenaire.objects.filter(
+            client_profile=request.user.client_profile).\
+                select_related('service').values_list(
+                    'service__nom_service', flat=True))
+        services = am.ServiceEvenement.objects.select_related(
+                'service').filter(
+                service__nom_service__in=services_partner)
+    elif client_profile.type_client == 'Client':
+        services = am.ServiceEvenement.objects.select_related(
+                'evenement_client').filter(
+                evenement_client__client_profile=request.user.client_profile)
+
     return render(request, template, {"services": services})
+
+
+def detail_service(request, pk):
+    """
+    Ici, les clients et partenaires peuvent consulter le détail d'un service
+    demandé avec possibilité de discussion
+    """
+
+    service = am.ServiceEvenement.objects.get(id=pk)
+    template = 'services/details.html'
+    return render(request, template, {"service": service})
 
 
 def creer_evenement(request):
     """
     la fonction creer evenement pour creer un evenement
     """
-
 
     types_evenements = m00.EVENEMENT_TYPES
     types_services = am.Service.objects.all()
@@ -215,6 +239,54 @@ def ajax_calls(request):
     if request.method == 'POST':
         received_json_data = json.loads(request.body)
         action = received_json_data['action']
+
+        if action == "envoyer_message_sur_evenement":
+
+            nv_message = am.MessageService()
+            nv_message.service_evenement = am.ServiceEvenement.objects.get(
+                id=received_json_data['service'])
+            nv_message.message_sender = am.ClientProfile.objects.get(
+                id=received_json_data['sender'])
+            nv_message.message_receiver = am.ClientProfile.objects.get(
+                id=received_json_data['receiver'])
+            nv_message.message = received_json_data['message']
+            nv_message.save()
+            data_dict = {}
+
+        if action == "get_messages_service":
+
+            service = am.ServiceEvenement.objects.get(
+                id=received_json_data['service'])
+
+            other_person = am.ClientProfile.objects.get(
+                id=received_json_data['other_person'])
+
+            messages = am.MessageService.objects.filter(
+                (Q(message_sender=request.user.client_profile.id) | Q(message_receiver = request.user.client_profile.id)),
+                (Q(message_sender=other_person) | Q(message_receiver = other_person)),
+                service_evenement=service
+                )
+
+            list_of_senders = list(set([m.message_sender for m in messages]))
+            
+            html_senders = render_to_string(
+                template_name="services/liste-senders.html",
+                context={
+                    "list_of_senders": list_of_senders,
+                    "client_profile": request.user.client_profile}
+                )
+
+            html_conversation = render_to_string(
+                template_name="services/chat-area.html",
+                context={
+                    "messages": messages,
+                    "client_profile": request.user.client_profile}
+                )
+
+            data_dict = {
+                "html_conversation": html_conversation,
+                "html_senders": html_senders
+                }
 
         if action == "creer_evenement":
 

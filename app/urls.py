@@ -6,7 +6,6 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns=[
     path("", av.accueil, name="accueil"),
-    path("evenements", av.list_evenements, name="list_evenements"),
     
     #////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +44,8 @@ urlpatterns=[
     #////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     path("creer-evenement/", av.creer_evenement, name='creer_evenement'),
+    path("liste-services/", av.liste_services, name='liste_services'),
+    path("service/details/<int:pk>", av.detail_service, name='detail_service'),
     path("services-partenaire/", av.partenaire_service, name='partenaire_service'),
     path("creer-service-partenaire/", av.ajouter_service_partenaire, name='ajouter_service_partenaire'),
     
