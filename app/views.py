@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, logout, login as auth_login
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 
 # IMPORTATION APP
 import app.forms as af
@@ -188,12 +188,21 @@ def liste_services(request):
     """
 
     template = 'partenaire/index.html'
-    user = request.user
-    partenaire = am.ClientProfile.objects.get(user=user)
-    services_partner = am.ServicePartenaire.objects.filter(
-        client_profile=request.user.client_profile)
-    print(services_partner)
-    services = am.ServiceEvenement.objects.filter()
+
+    client_profile = request.user.client_profile
+    
+    if client_profile.type_client == 'Partenaire':
+        services_partner = list(am.ServicePartenaire.objects.filter(
+            client_profile=request.user.client_profile).\
+                select_related('service').values_list(
+                    'service__nom_service', flat=True))
+        services = am.ServiceEvenement.objects.select_related(
+                'service').filter(
+                service__nom_service__in=services_partner)
+    elif client_profile.type_client == 'Client':
+        services = am.ServiceEvenement.objects.select_related(
+                'evenement_client').filter(
+                evenement_client__client_profile=request.user.client_profile)
 
     return render(request, template, {"services": services})
 
@@ -229,6 +238,54 @@ def ajax_calls(request):
     if request.method == 'POST':
         received_json_data = json.loads(request.body)
         action = received_json_data['action']
+
+        if action == "envoyer_message_sur_evenement":
+
+            nv_message = am.MessageService()
+            nv_message.service_evenement = am.ServiceEvenement.objects.get(
+                id=received_json_data['service'])
+            nv_message.message_sender = am.ClientProfile.objects.get(
+                id=received_json_data['sender'])
+            nv_message.message_receiver = am.ClientProfile.objects.get(
+                id=received_json_data['receiver'])
+            nv_message.message = received_json_data['message']
+            nv_message.save()
+            data_dict = {}
+
+        if action == "get_messages_service":
+
+            service = am.ServiceEvenement.objects.get(
+                id=received_json_data['service'])
+
+            other_person = am.ClientProfile.objects.get(
+                id=received_json_data['other_person'])
+
+            messages = am.MessageService.objects.filter(
+                (Q(message_sender=request.user.client_profile.id) | Q(message_receiver = request.user.client_profile.id)),
+                (Q(message_sender=other_person) | Q(message_receiver = other_person)),
+                service_evenement=service
+                )
+
+            list_of_senders = list(set([m.message_sender for m in messages]))
+            
+            html_senders = render_to_string(
+                template_name="services/liste-senders.html",
+                context={
+                    "list_of_senders": list_of_senders,
+                    "client_profile": request.user.client_profile}
+                )
+
+            html_conversation = render_to_string(
+                template_name="services/chat-area.html",
+                context={
+                    "messages": messages,
+                    "client_profile": request.user.client_profile}
+                )
+
+            data_dict = {
+                "html_conversation": html_conversation,
+                "html_senders": html_senders
+                }
 
         if action == "creer_evenement":
 

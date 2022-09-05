@@ -1,0 +1,30 @@
+{% if client_profile.type_client == "Client" %}
+{% for sender in list_of_senders %}
+
+    <div class="sender_div {{sender.id}}">{{sender}}</div>
+
+{% endfor %}
+
+
+<style>
+
+.sender_div
+{
+    border: 1px solid #cdc3c3;
+    width: 100% !important;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    color: black;
+}
+
+.sender_div:hover
+{
+    color:rgb(30, 129, 168);
+    font-weight:600
+}
+
+</style>
+{% endif %}

@@ -2116,13 +2116,11 @@ textarea.form-control-lg {
     filter: none;
     opacity: 0.65; }
 
-.content
-{
-  margin-top: 100px;
-}
+
 .m-3
 {
-  margin-top:0 !important;
+  margin:0 !important;
+  margin-top:150px !important;
 }
 
 .form-range {
@@ -6474,7 +6472,7 @@ textarea.form-control-lg {
 
 .m-3 {
   margin: 1rem !important;
-  margin-top:0 !important; }
+  margin-top:150px !important; }
 
 .m-4 {
   margin: 1.5rem !important; }

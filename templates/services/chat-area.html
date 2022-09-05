@@ -1,0 +1,88 @@
+<div class="card">
+    <div class="card-body">
+
+
+        {% for message in messages %}
+        
+        {% if message.message_sender == client_profile %}
+            <div class="message_container_me mt-2"><div class="message_sender"><span class="sender_name">{{message.message_sender}}:</span><br></div><span class="message_text_me">{{message.message}}</span></div>    
+        {% else %}
+            <div class="message_container_other mt-2"><div class="message_sender"><span class="sender_name">{{message.message_sender}}:</span><br></div><span class="message_text_other">{{message.message}}</span></div>  
+        {% endif %}
+
+
+        {% endfor %}
+
+    </div>
+</div>
+
+
+<style>
+
+
+
+
+.message_container_me
+{
+    text-align: right;
+}
+
+.message_text_other
+{
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background: grey;
+    font-size:1.1em;
+}
+
+.message_sender
+{
+    font-weight:600;
+    margin-bottom:5px;
+}
+
+.message_text_me
+{
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background: #48cb68;
+    font-size:1.1em;
+}
+
+
+
+</style>
+
+
+<script>
+
+var last_sender = ""
+$( ".sender_name" ).each(function( index ) {
+
+    if(last_sender == $(this).html())
+    {
+        last_sender = $(this).html();
+        $(this).closest(".message_sender").remove()
+    }else
+    {
+        last_sender = $(this).html();
+    }
+
+});
+
+
+
+
+</script>
