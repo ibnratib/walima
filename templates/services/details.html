@@ -118,9 +118,13 @@ $(document).on("click", "#envoyer_message", function(event) {
     })
 
 });
-
-
 get_messages();
+
+setInterval(function () {
+    get_messages();
+    },10000);
+
+
 
 
 function get_messages()
@@ -133,6 +137,7 @@ function get_messages()
 	{
 		other_person = chosen_partenaire
 	}
+    console.log(other_person)
 
 	data_dict={"action":"get_messages_service", "service": "{{service.id}}", "other_person": other_person}
     $.ajax({

@@ -1,62 +1,8 @@
 {% extends "general/base.html" %}
 {% load i18n %}
-
-
-
-
 {% block body %}
 {% csrf_token %} 
-<div class="site-mobile-menu site-navbar-target">
-    <div class="site-mobile-menu-header">
-      <div class="site-mobile-menu-close">
-        <span class="icofont-close js-menu-toggle"></span>
-      </div>
-    </div>
-    <div class="site-mobile-menu-body"></div>
-  </div>
 
-  <nav class="site-nav">
-    <div class="container">
-      <div class="menu-bg-wrap">
-        <div class="site-navigation">
-          <a href="index.html" class="logo m-0 float-start">Property</a>
-
-          <ul
-            class="js-clone-nav d-none d-lg-inline-block text-start site-menu float-end"
-          >
-            <li class="active"><a href="index.html">Home</a></li>
-            <!-- <li class="has-children">
-              <a href="properties.html">Properties</a>
-              <ul class="dropdown">
-                <li><a href="#">Buy Property</a></li>
-                <li><a href="#">Sell Property</a></li>
-                <li class="has-children">
-                  <a href="#">Dropdown</a>
-                  <ul class="dropdown">
-                    <li><a href="#">Sub Menu One</a></li>
-                    <li><a href="#">Sub Menu Two</a></li>
-                    <li><a href="#">Sub Menu Three</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li> -->
-            <li><a href="services.html">Services</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="inscription">{% trans "Inscriptions" %}</a></li>
-          </ul>
-
-          <a
-            href="#"
-            class="burger light me-auto float-end mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
-            data-toggle="collapse"
-            data-target="#main-navbar"
-          >
-            <span></span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
 
   <div class="hero">
     <div class="hero-slide">
@@ -78,9 +24,9 @@
       <div class="row justify-content-center align-items-center">
         <div class="col-lg-9 text-center">
           <h1 class="heading" data-aos="fade-up">
-            Easiest way to find your dream home
+            L'outil le plus éfficace pour gérer vos événements
           </h1>
-          <form
+          <!-- <form
             action="#"
             class="narrow-w form-search d-flex align-items-stretch mb-3"
             data-aos="fade-up"
@@ -91,8 +37,8 @@
               class="form-control px-4"
               placeholder="Your ZIP code or City. e.g. New York"
             />
-            <button type="submit" class="btn btn-primary">Search</button>
-          </form>
+            <button type="submit" class="btn btn-primary">Chercher</button>
+          </form> -->
         </div>
       </div>
     </div>
@@ -103,18 +49,8 @@
       <div class="row mb-5 align-items-center">
         <div class="col-lg-6">
           <h2 class="font-weight-bold text-primary heading">
-            Popular Properties
+            Liste des annonces
           </h2>
-        </div>
-        <div class="col-lg-6 text-lg-end">
-          <p>
-            <a
-              href="#"
-              target="_blank"
-              class="btn btn-primary text-white py-3 px-4"
-              >View all properties</a
-            >
-          </p>
         </div>
       </div>
       <div class="row">

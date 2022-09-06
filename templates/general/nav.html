@@ -34,6 +34,7 @@
                 </li>
               </ul>
             </li> -->
+            
             {% if  request.user.client_profile.type_client == 'Partenaire'  %}
 
               <li><a href="{% url 'partenaire_service' %}">Mes services</a></li>
