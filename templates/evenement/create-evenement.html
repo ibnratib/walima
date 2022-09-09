@@ -5,6 +5,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 
 <main class="content m-3">
 	<div class="row step_1_ev">
@@ -178,7 +180,7 @@ var service_html = `
             <select class="form-control type_service">
                 <option value = ""></option>
                 {% for ser in types_services %}
-                    <option value="{{ser.0}}">{{ser.0}}</option>
+                    <option value="{{ser.id}}">{{ser.nom_service}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -263,6 +265,7 @@ $(document).on("click", ".delete_service", function(event) {
     
 });
 
+$( ".date_champ" ).datepicker();
 
 // AJOUT SUPRESSION DES SERVICES
 
@@ -288,7 +291,10 @@ $(document).on("click", "#save_evenement", function(event) {
                 title: 'Votre événement a été enregistré avec succès',
                 showConfirmButton: false,
                 timer: 1500
+            }).then((result) => {
+                window.location.href = "{% url 'liste_services' %}"
             })
+            
         }
     })
     $(".swal2-container").hide()

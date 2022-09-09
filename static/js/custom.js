@@ -135,10 +135,4 @@
 		}
 		return "";
 	 }
-	
-
-	 $( function() {
-		$( ".date_champ" ).datepicker();
-	  } );
-
 })()

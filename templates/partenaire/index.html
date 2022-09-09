@@ -62,37 +62,40 @@
               {{services}}
             {% for service in services %}
               <div class="property-item">
-                <a href="property-single.html" class="img">
-                  <img src="images/img_2.jpg" alt="Image" class="img-fluid" />
-                </a>
                   
-                <div class="property-content">
-                  <div class="price mb-2"><span>{{service.service}}</span></div>
+                <div style="margin-top:50px;" class="property-content">
                   <div>
                     <span class="d-block mb-2 text-black-50"
-                      >{{service.evenement_client.client_profile.ville}}, Maroc</span>
+                      >{{service.ville}}, Maroc</span>
                     <span class="city d-block mb-3">{{service.service.nom_service}}</span>
 
                     <div class="specs d-flex mb-4">
                       <span class="d-block d-flex align-items-center me-3">
-                        
-                        <span class="caption">{{service.evenement_client.type_evenement}}</span>
+                        <span class="caption">{{service.type_evenement}}</span>
                       </span>
                       <span class="d-block d-flex align-items-center me-3">
                         <span class="icon-person me-2"></span>
-                        <span class="caption">{{service.evenement_client.nombre_invites}}</span>
+                        <span class="caption">{{service.nombre_invites}}</span>
                       </span>
                       <span class="d-block d-flex align-items-center">
-                       
-                        <span class="caption">{{service.evenement_client.date|date:"M d, Y"}}</span>
+                        <span class="caption">{{service.date|date:"M d, Y"}}</span>
                       </span>
                     </div>
-
+                    {% if request.user.client_profile.type_client == 'Client' %}
                     <a
                       href="{% url 'detail_service' service.id %}"
                       class="btn btn-primary py-2 px-3"
-                      >Détails</a
+                      >Propositions</a
                     >
+                    {% else %}
+                    <a
+                      href="{% url 'detail_service' service.id %}"
+                      class="btn btn-primary py-2 px-3"
+                      >Détails</a>
+                    {% endif %}
+                    {% if service.unread_messages > 0 %}
+                    <span style="font-size:1em;" class="badge bg bg-success">{{service.unread_messages}} messages non lues</badge>
+                    {% endif %}
                   </div>
                 </div>
               </div>

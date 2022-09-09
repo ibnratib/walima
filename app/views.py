@@ -15,11 +15,13 @@ from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db.models import CharField, Value
 
 # IMPORTATION APP
 import app.forms as af
 import app.models as am
 import app.m00_common as m00
+import app.queries as aq
 
 def accueil(request):
     template = "index.html"
@@ -182,6 +184,7 @@ def logout_view(request):
     return redirect('/')
 
 
+@login_required(login_url='/')
 def liste_services(request):
     """
     la fonction qui permet de lister les evenements qui concernent un
@@ -189,25 +192,12 @@ def liste_services(request):
     """
 
     template = 'partenaire/index.html'
+    services = aq.annonces_compe_client(request.user.client_profile)
 
-    client_profile = request.user.client_profile
-    
-    if client_profile.type_client == 'Partenaire':
-        services_partner = list(am.ServicePartenaire.objects.filter(
-            client_profile=request.user.client_profile).\
-                select_related('service').values_list(
-                    'service__nom_service', flat=True))
-        services = am.ServiceEvenement.objects.select_related(
-                'service').filter(
-                service__nom_service__in=services_partner)
-    elif client_profile.type_client == 'Client':
-        services = am.ServiceEvenement.objects.select_related(
-                'evenement_client').filter(
-                evenement_client__client_profile=request.user.client_profile)
-
+    print(services)
     return render(request, template, {"services": services})
 
-
+@login_required(login_url='/')
 def detail_service(request, pk):
     """
     Ici, les clients et partenaires peuvent consulter le détail d'un service
@@ -218,7 +208,7 @@ def detail_service(request, pk):
     template = 'services/details.html'
     return render(request, template, {"service": service})
 
-
+@login_required(login_url='/')
 def creer_evenement(request):
     """
     la fonction creer evenement pour creer un evenement
@@ -234,7 +224,7 @@ def creer_evenement(request):
     }
     return render(request, 'evenement/create-evenement.html', context)
 
-
+@login_required(login_url='/')
 def ajax_calls(request):
     if request.method == 'POST':
         received_json_data = json.loads(request.body)
@@ -268,6 +258,12 @@ def ajax_calls(request):
                 list_of_senders = list(set([m.message_sender for m in messages]))
                 messages=[]
 
+               #mark messages as read
+                am.MessageService.objects.filter(
+                                    message_receiver = request.user.client_profile,
+                                    service_evenement=service).update(
+                                        message_read=True)
+
             else:
                 other_person = am.ClientProfile.objects.get(
                     id=received_json_data['other_person'])
@@ -277,10 +273,17 @@ def ajax_calls(request):
                     service_evenement=service
                     )
                 list_of_senders = list(set([m.message_sender for m in messages]))
-                
 
-            
-            
+                #mark messages as read
+                am.MessageService.objects.filter(
+                                    message_receiver = request.user.client_profile,
+                                    message_sender=other_person,
+                                    service_evenement=service).update(
+                                        message_read=True)
+
+            if len(list_of_senders) == 0 and request.user.client_profile.type_client == "Client":
+                list_of_senders = ["Aucun interessé pour le moment"]
+                
             html_senders = render_to_string(
                 template_name="services/liste-senders.html",
                 context={

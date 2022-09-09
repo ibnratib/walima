@@ -1,8 +1,9 @@
 {% if client_profile.type_client == "Client" %}
 {% for sender in list_of_senders %}
 
+    {% if sender.id != client_profile.id %}
     <div class="sender_div {{sender.id}}">{{sender}}</div>
-
+    {% endif %}
 {% endfor %}
 
 

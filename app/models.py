@@ -116,7 +116,7 @@ class ServiceEvenement(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
+    
 
 class MessageService(models.Model):
     service_evenement = models.ForeignKey(
@@ -135,5 +135,6 @@ class MessageService(models.Model):
         null=False,
         blank=False, related_name='message_receiver')
     message = models.TextField()
+    message_read = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
