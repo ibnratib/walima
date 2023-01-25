@@ -1,1 +1,0 @@
-web: gunicorn walima.wsgi --log-file -
